@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+
+  <title>Control de Compras Internas | Musicala</title>
+  <meta
+    name="description"
+    content="Aplicativo para registrar, gestionar y hacer seguimiento a compras internas de Musicala."
+  />
+  <meta name="theme-color" content="#f6f8fc" />
+  <meta name="color-scheme" content="light" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app">
+
+    <!-- ENCABEZADO -->
+    <section class="hero hero--corporate">
+      <div class="hero-top">
+        <div class="hero-brand">
+          <div class="hero-brand-wrap">
+            <div class="hero-logo-shell">
+              <img
+                class="hero-logo"
+                src="./logo.png"
+                alt="Logo Musicala"
+                width="84"
+                height="84"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+
+            <div>
+              <div class="eyebrow">Musicala · Abastecimiento interno</div>
+              <h1>Control de compras internas</h1>
+              <p>
+                Registro centralizado para requerimientos internos, cotización y seguimiento de compras del equipo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-side">
+          <article class="hero-panel hero-panel-highlight">
+            <span class="k">Alcance</span>
+            <div class="v">Solicitudes operativas por áreas, sede, oficina y materiales de apoyo.</div>
+          </article>
+
+          <article class="hero-panel">
+            <span class="k">Propósito</span>
+            <div class="v">Mejorar visibilidad, priorización y trazabilidad en el proceso de compra.</div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- RESUMEN -->
+    <section class="card">
+      <div class="card-body">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Resumen general</p>
+            <h2 class="section-title">Estado actual de compras</h2>
+          </div>
+
+          <div class="section-actions">
+            <button class="btn btn-soft" id="btnRefreshTop" type="button">
+              Actualizar indicadores
+            </button>
+          </div>
+        </div>
+
+        <div class="stats" id="statsGrid">
+          <article class="stat stat-emphasis">
+            <div class="label">Pendientes</div>
+            <div class="value" id="statPendientes">0</div>
+            <div class="mini">Solicitudes activas por resolver</div>
+          </article>
+
+          <article class="stat">
+            <div class="label">Comprados</div>
+            <div class="value" id="statComprados">0</div>
+            <div class="mini">Registros ya cerrados por compra</div>
+          </article>
+
+          <article class="stat">
+            <div class="label">Estimado pendiente</div>
+            <div class="value" id="statEstimado">$0</div>
+            <div class="mini">Valor proyectado aún por ejecutar</div>
+          </article>
+
+          <article class="stat">
+            <div class="label">Gastado comprado</div>
+            <div class="value" id="statGastado">$0</div>
+            <div class="mini">Valor confirmado en compras realizadas</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZONA CENTRAL -->
+    <section class="grid grid-main grid-main-admin">
+
+      <!-- FORMULARIO -->
+      <article class="card">
+        <div class="card-body">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Registro</p>
+              <h2 class="section-title">Nueva solicitud de compra</h2>
+            </div>
+            <div class="section-actions section-actions-inline">
+              <button class="icon-btn" id="btnHelpGuide" type="button" aria-label="Ver guía rápida">
+                ?
+              </button>
+            </div>
+          </div>
+
+          <form id="formCreate" novalidate>
+            <div class="form-block">
+              <div class="form-block-head">
+                <h3>Información principal</h3>
+                <p>Registren lo esencial primero. El sistema no necesita drama, necesita datos.</p>
+              </div>
+
+              <div class="row">
+                <label class="field field-span-2">
+                  <span class="field-label">Producto o requerimiento</span>
+                  <input
+                    id="item"
+                    name="item"
+                    type="text"
+                    placeholder="Ej: resmas carta, baquetas, cables XLR, marcadores borrables..."
+                    required
+                  />
+                  <div class="small hidden" id="duplicateHint"></div>
+                </label>
+              </div>
+
+              <div class="row row-3">
+                <label class="field field-compact">
+                  <span class="field-label">Categoría</span>
+                  <input
+                    id="categoria"
+                    name="categoria"
+                    type="text"
+                    placeholder="Ej: oficina, música, danza, aseo, mantenimiento..."
+                  />
+                  <div class="chips chips-inline" id="quickCategoryChips">
+                    <button class="chip chip-static quick-chip" type="button" data-category="Música">Música</button>
+                    <button class="chip chip-static quick-chip" type="button" data-category="Danza">Danza</button>
+                    <button class="chip chip-static quick-chip" type="button" data-category="Teatro">Teatro</button>
+                    <button class="chip chip-static quick-chip" type="button" data-category="Oficina">Oficina</button>
+                    <button class="chip chip-static quick-chip" type="button" data-category="Aseo">Aseo</button>
+                    <button class="chip chip-static quick-chip" type="button" data-category="Mantenimiento">Mantenimiento</button>
+                  </div>
+                </label>
+
+                <label class="field field-compact">
+                  <span class="field-label">Prioridad</span>
+                  <select id="prioridad" name="prioridad">
+                    <option value="alta">Alta</option>
+                    <option value="media" selected>Media</option>
+                    <option value="baja">Baja</option>
+                  </select>
+                </label>
+
+                <label class="field field-compact">
+                  <span class="field-label">Anotado por</span>
+                  <input
+                    id="anotadoPor"
+                    name="anotadoPor"
+                    type="text"
+                    placeholder="Ej: Alek, Cata, recepción, coordinación..."
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div class="form-block">
+              <div class="form-block-head">
+                <h3>Referencia de compra</h3>
+                <p>Agreguen contexto para que comprar después no sea una expedición arqueológica.</p>
+              </div>
+
+              <div class="row">
+                <label class="field">
+                  <span class="field-label">Precio estimado</span>
+                  <input
+                    id="precioEstimado"
+                    name="precioEstimado"
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="0"
+                  />
+                </label>
+
+                <label class="field">
+                  <span class="field-label">Lugar sugerido</span>
+                  <input
+                    id="lugarSugerido"
+                    name="lugarSugerido"
+                    type="text"
+                    placeholder="Ej: Panamericana, Homecenter, Mercado Libre, D1..."
+                  />
+                </label>
+              </div>
+
+              <div class="row">
+                <label class="field">
+                  <span class="field-label">Tags</span>
+                  <input
+                    id="tags"
+                    name="tags"
+                    type="text"
+                    placeholder="Ej: oficina, urgente, sede, salón 3, teatro..."
+                  />
+                </label>
+
+                <div class="field field-note">
+                  <span class="field-label">Uso recomendado</span>
+                  <div class="small">
+                    Usen categorías y tags consistentes para que luego sí sirva filtrar.
+                  </div>
+                </div>
+              </div>
+
+              <label class="field">
+                <span class="field-label">Notas</span>
+                <textarea
+                  id="notas"
+                  name="notas"
+                  placeholder="Marca, tamaño, referencia, cantidad, color, uso previsto, detalle útil..."
+                ></textarea>
+              </label>
+            </div>
+
+            <div class="actions actions-sticky">
+              <button class="btn btn-primary" type="submit">
+                Guardar solicitud
+              </button>
+
+              <button class="btn btn-soft" type="reset">
+                Limpiar formulario
+              </button>
+            </div>
+          </form>
+        </div>
+      </article>
+
+      <!-- PANEL LATERAL -->
+      <aside class="sidebar-stack">
+        <article class="card">
+          <div class="card-body">
+            <div class="section-head compact">
+              <div>
+                <p class="section-kicker">Plan de compra</p>
+                <h3 class="section-title">Carrito rápido</h3>
+              </div>
+            </div>
+
+            <div class="cart-summary">
+              <article class="kv">
+                <span class="k">Seleccionados</span>
+                <div class="v" id="cartCount">0 pendientes</div>
+              </article>
+
+              <article class="kv">
+                <span class="k">Estimado</span>
+                <div class="v" id="cartEstimated">$0</div>
+              </article>
+
+              <article class="kv">
+                <span class="k">Urgentes</span>
+                <div class="v" id="cartUrgent">0 altas</div>
+              </article>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-soft" id="btnClearCart" type="button">
+                Limpiar carrito
+              </button>
+              <button class="btn btn-soft" id="btnCopyCart" type="button">
+                Copiar para cotizar
+              </button>
+              <button class="btn btn-primary" id="btnDownloadCart" type="button">
+                Descargar lista
+              </button>
+            </div>
+
+            <section id="cartContainer" class="cart-list" aria-live="polite">
+              <div class="empty compact-empty">
+                Aún no han seleccionado compras para esta vuelta.
+              </div>
+            </section>
+          </div>
+        </article>
+
+      </aside>
+    </section>
+
+    <!-- LISTADO -->
+    <section class="card">
+      <div class="card-body">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Gestión</p>
+            <h2 class="section-title">Listado de solicitudes</h2>
+          </div>
+
+          <div class="section-actions">
+            <button class="btn btn-soft" id="btnRefreshList" type="button">
+              Recargar lista
+            </button>
+          </div>
+        </div>
+
+        <div class="toolbar toolbar-admin">
+          <div class="toolbar-row toolbar-row-head">
+            <div class="chips" id="estadoChips">
+              <button class="chip active" data-estado="" type="button">Todos</button>
+              <button class="chip" data-estado="pendiente" type="button">Pendientes</button>
+              <button class="chip" data-estado="comprado" type="button">Comprados</button>
+              <button class="chip" data-estado="descartado" type="button">Descartados</button>
+            </div>
+          </div>
+
+          <div class="toolbar-top toolbar-top-admin">
+            <label class="toolbar-field toolbar-field-search">
+              <span class="toolbar-label">Buscar</span>
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="Producto, categoría, notas, tags..."
+              />
+            </label>
+
+            <label class="toolbar-field">
+              <span class="toolbar-label">Prioridad</span>
+              <select id="filterPrioridad">
+                <option value="">Todas las prioridades</option>
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
+              </select>
+            </label>
+
+            <label class="toolbar-field">
+              <span class="toolbar-label">Categoría</span>
+              <input
+                id="filterCategoria"
+                type="text"
+                placeholder="Filtrar categoría"
+              />
+            </label>
+
+            <label class="toolbar-field">
+              <span class="toolbar-label">Orden</span>
+              <select id="sortBy">
+                <option value="updated_desc">Más recientes</option>
+                <option value="created_desc">Creación reciente</option>
+                <option value="created_asc">Creación antigua</option>
+                <option value="updated_asc">Actualización antigua</option>
+                <option value="priority">Prioridad</option>
+                <option value="cart_priority">Carrito y prioridad</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <section id="listContainer" class="list" aria-live="polite">
+          <div class="empty">
+            Cargando registros...
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Musicala · Control interno de compras y trazabilidad de requerimientos operativos.
+    </p>
+  </main>
+
+  <!-- MODAL: MARCAR COMO COMPRADO -->
+  <dialog id="purchaseDialog">
+    <div class="modal-head">
+      <div>
+        <p class="section-kicker">Actualización</p>
+        <h3>Registrar compra realizada</h3>
+        <div class="small" id="purchaseDialogItemName">—</div>
+      </div>
+
+      <button
+        class="btn btn-soft btn-close"
+        type="button"
+        data-close-dialog="purchaseDialog"
+      >
+        Cerrar
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form id="formPurchase" novalidate>
+        <input type="hidden" id="purchaseId" />
+
+        <div class="row">
+          <label class="field">
+            <span class="field-label">Precio real</span>
+            <input
+              id="purchasePrecioReal"
+              type="number"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              placeholder="0"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Lugar de compra</span>
+            <input
+              id="purchaseLugarCompra"
+              type="text"
+              placeholder="Ej: Panamericana, Homecenter, Mercado Libre..."
+            />
+          </label>
+        </div>
+
+        <div class="row">
+          <label class="field">
+            <span class="field-label">Comprado por</span>
+            <input
+              id="purchaseCompradoPor"
+              type="text"
+              placeholder="Responsable de la compra"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Fecha de compra</span>
+            <input id="purchaseFechaCompra" type="date" />
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Notas</span>
+          <textarea
+            id="purchaseNotas"
+            placeholder="Detalle útil de la compra final..."
+          ></textarea>
+        </label>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">
+            Guardar compra
+          </button>
+
+          <button
+            class="btn btn-soft"
+            type="button"
+            data-close-dialog="purchaseDialog"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- MODAL: EDITAR -->
+  <dialog id="editDialog">
+    <div class="modal-head">
+      <div>
+        <p class="section-kicker">Edición</p>
+        <h3>Actualizar registro</h3>
+        <div class="small" id="editDialogItemName">—</div>
+      </div>
+
+      <button
+        class="btn btn-soft btn-close"
+        type="button"
+        data-close-dialog="editDialog"
+      >
+        Cerrar
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form id="formEdit" novalidate>
+        <input type="hidden" id="editId" />
+
+        <div class="form-block">
+          <div class="form-block-head">
+            <h3>Información principal</h3>
+            <p>Modifiquen los datos generales del registro.</p>
+          </div>
+
+          <div class="row">
+            <label class="field">
+              <span class="field-label">Producto o compra</span>
+              <input id="editItem" type="text" required />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Categoría</span>
+              <input id="editCategoria" type="text" />
+            </label>
+          </div>
+
+          <div class="row row-3">
+            <label class="field">
+              <span class="field-label">Prioridad</span>
+              <select id="editPrioridad">
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Estado</span>
+              <select id="editEstado">
+                <option value="pendiente">Pendiente</option>
+                <option value="comprado">Comprado</option>
+                <option value="descartado">Descartado</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Precio estimado</span>
+              <input
+                id="editPrecioEstimado"
+                type="number"
+                min="0"
+                step="1"
+                inputmode="numeric"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <div class="form-block-head">
+            <h3>Seguimiento</h3>
+            <p>Completen la trazabilidad de la compra cuando aplique.</p>
+          </div>
+
+          <div class="row">
+            <label class="field">
+              <span class="field-label">Lugar sugerido</span>
+              <input id="editLugarSugerido" type="text" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Tags</span>
+              <input id="editTags" type="text" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label class="field">
+              <span class="field-label">Anotado por</span>
+              <input id="editAnotadoPor" type="text" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Precio real</span>
+              <input
+                id="editPrecioReal"
+                type="number"
+                min="0"
+                step="1"
+                inputmode="numeric"
+              />
+            </label>
+          </div>
+
+          <div class="row">
+            <label class="field">
+              <span class="field-label">Lugar compra</span>
+              <input id="editLugarCompra" type="text" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Comprado por</span>
+              <input id="editCompradoPor" type="text" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label class="field">
+              <span class="field-label">Fecha compra</span>
+              <input id="editFechaCompra" type="date" />
+            </label>
+
+            <div class="field field-note">
+              <span class="field-label">Nota útil</span>
+              <div class="small">
+                Si el registro queda como comprado, idealmente completen responsable, fecha, lugar y valor real.
+              </div>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Notas</span>
+            <textarea id="editNotas"></textarea>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">
+            Guardar cambios
+          </button>
+
+          <button
+            class="btn btn-soft"
+            type="button"
+            data-close-dialog="editDialog"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="helpDialog">
+    <div class="modal-head">
+      <div>
+        <p class="section-kicker">Guía rápida</p>
+        <h3>Criterios de registro</h3>
+        <div class="small">Referencia breve para mantener consistencia en el equipo.</div>
+      </div>
+
+      <button
+        class="btn btn-soft btn-close"
+        type="button"
+        data-close-dialog="helpDialog"
+      >
+        Cerrar
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="tips-list">
+        <article class="kv">
+          <span class="k">Registro oportuno</span>
+          <div class="v">Ingresar la solicitud tan pronto se identifique la necesidad.</div>
+        </article>
+
+        <article class="kv">
+          <span class="k">Descripción</span>
+          <div class="v">Registrar nombre, referencia y cantidad cuando aplique.</div>
+        </article>
+
+        <article class="kv">
+          <span class="k">Seguimiento</span>
+          <div class="v">Usar carrito, cotización y estado de compra para conservar trazabilidad.</div>
+        </article>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="statusbar" aria-live="polite" aria-atomic="true">
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>
